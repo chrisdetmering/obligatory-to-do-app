@@ -1,47 +1,49 @@
-let pressEnterToSubmit = document.getElementById("new-task-item");
-pressEnterToSubmit.addEventListener("keydown", saveAndPrintTaskItem);
 
-let createKey = 0;
+document.getElementById("task-form")
+.addEventListener("submit", saveAndPrintTaskItem);
+
 
 function saveAndPrintTaskItem(e) {
+    e.preventDefault();
 
-    if (e.key === "Enter") {
-        e.preventDefault();
-        createKey++;
+    const taskInput = document.getElementById("new-task-item")
+    const text = taskInput.value; 
 
-        // ** grab and save the new task item from the input field
-        let taskItem = document.getElementById("new-task-item").value;
-        // check to see if the input is blank
-        if (taskItem == "") {
-            alert("I need orders!");
-            return false;
-        }
-        sessionStorage.setItem(createKey, taskItem);
-        let grabTaskItem = sessionStorage.getItem(createKey);
+    if (text === "") {
+        alert("I need orders!");
+        return; 
+    }
 
-        // ** print the task item to the page and the delete button
-        let taskContainer = document.getElementById("list-tasks");
-        let li = document.createElement("li");
-        li.setAttribute("onclick", "markCompleted(this)");
-        li.appendChild(document.createTextNode(grabTaskItem));
-        taskContainer.appendChild(li);
-        let deleteButton = document.createElement("button");
-        deleteButton.appendChild(document.createTextNode("X"));
-        deleteButton.setAttribute("id", createKey);
-        deleteButton.setAttribute("onclick", "didUserDelete(this.id)");
-        deleteButton.classList.add("delete-button");
-        li.appendChild(deleteButton);
-        pressEnterToSubmit.value = '';
-    } 
+    const taskContainer = document.getElementById("list-tasks");
+    const li = document.createElement("li");
+    const deleteButton = createDeleteButton(li); 
+    const taskText = createTaskText(text); 
+
+    li.appendChild(deleteButton);
+    li.appendChild(taskText);
+    taskContainer.appendChild(li);
+    taskInput.value = '';
 }
 
-function didUserDelete(e) {
-    let deletedListElement = document.getElementById(e).parentElement;
-    deletedListElement.remove();
-    sessionStorage.removeItem(e);
+function createDeleteButton(task) { 
+    const deleteButton = document.createElement("button");
+    deleteButton.appendChild(document.createTextNode("X"));
+    deleteButton.classList.add("delete-button");
+
+    deleteButton.addEventListener("click", () => { 
+        task.remove(); 
+    })
+
+    return deleteButton; 
 }
 
-function markCompleted(e) {
-    let markComplete = e;
-    markComplete.classList.toggle("task-complete");
+
+
+function createTaskText(text) { 
+    const textParagraph = document.createElement('p'); 
+    textParagraph.textContent = text; 
+    textParagraph.addEventListener('click', () => { 
+        textParagraph.classList.toggle("task-complete");
+    })
+    return textParagraph; 
 }
